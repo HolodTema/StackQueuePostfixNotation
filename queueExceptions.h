@@ -3,24 +3,10 @@
 
 #include <stdexcept>
 
-class WrongQueueSizeException: public std::exception {
-public:
-    const char* what() const noexcept override {
-        return "Error: wrong queue size.\n";
-    }
-};
-
 class QueueUnderflowException: public std::exception {
 public:
     const char* what() const noexcept override {
         return "Error: queue underflow.\n";
-    }
-};
-
-class QueueOverflowException: public std::exception {
-public:
-    const char* what() const noexcept override {
-        return "Error: queue overflow.\n";
     }
 };
 

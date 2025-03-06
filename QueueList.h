@@ -1,6 +1,7 @@
 #ifndef QUEUE_LIST_H
 #define QUEUE_LIST_H
 
+#include <iostream>
 #include "Queue.h"
 #include "queueExceptions.h"
 
@@ -11,29 +12,39 @@ public:
 
     QueueList(const QueueList& other) {
         if (other.head_ != nullptr) {
-            head_ = new Node(other.head_->data, nullptr, nullptr);
+            head_ = new Node(other.head_->data, nullptr);
 
-            tail_ = head_;
-            Node* otherNode = other.head_->nextNode_;
+            Node* node = head_;
+            Node* otherNode = other.head_->nextNode;
 
-            while (otherNode != nullptr) {
-                tail_->nextNode = new Node(otherNode.data_, tail_, nullptr);
-                otherNode = otherNode->nextNode_;
-                node = node->nextNode_;
+            try {
+                while (otherNode != nullptr) {
+                    node->nextNode = new Node(otherNode->data, nullptr);
+                    otherNode = otherNode->nextNode;
+                    node = node->nextNode;
+                }
             }
+            catch (const std::bad_alloc& e) {
+                while (head_->nextNode != nullptr) {
+                    const Node* exHead = head_;
+                    head_ = head_->nextNode;
+                    delete exHead;
+                }
+                delete head_;
+            }
+
         }
     }
 
     QueueList(const QueueList&& other) noexcept:
-        head_(other.head_),
-        tail_(other.tail_)
+        head_(other.head_)
     {
 
     }
 
     ~QueueList() override {
         if (head_ != nullptr) {
-            while (head_->nextNode_ != nullptr) {
+            while (head_->nextNode != nullptr) {
                 const Node* exHead = head_;
                 head_ = head_->nextNode;
                 delete exHead;
@@ -44,7 +55,7 @@ public:
 
     QueueList& operator=(const QueueList& other) {
         if (&other != this) {
-            QueueList& otherCopy(other);
+            QueueList otherCopy(other);
             swap(otherCopy);
         }
         return *this;
@@ -53,7 +64,6 @@ public:
     QueueList& operator=(QueueList&& other) noexcept {
         if (&other != this) {
             head_ = other.head_;
-            tail_ = other.tail_;
         }
         return *this;
     }
@@ -62,14 +72,12 @@ public:
         if (head_ == nullptr) {
             throw QueueUnderflowException();
         }
-        if (head_->nextNode_ == nullptr) {
-            T result = head_->data_;
-            delete head_;
-            head_ = nullptr;
-            return result;
-        }
 
-        T newHead = head_;
+        T result = head_->data;
+        const Node* exHead = head_;
+        head_ = head_->nextNode;
+        delete exHead;
+        return result;
     }
 
     void enQueue(const T& element) override {
@@ -79,8 +87,8 @@ public:
         }
 
         Node* lastNode = head_;
-        while (lastNode->nextNode_ != nullptr) {
-            lastNode = lastNode->nextNode_;
+        while (lastNode->nextNode != nullptr) {
+            lastNode = lastNode->nextNode;
         }
         lastNode->nextNode = new Node(element, nullptr);
     }
@@ -89,25 +97,36 @@ public:
         return head_ == nullptr;
     }
 
-private:
-    class Node {
-        T data_;
-        Node* prevNode_;
-        Node* nextNode_;
+    template <typename T1>
+    friend std::ostream& operator<<(std::ostream& os, const QueueList<T1>& queue);
 
-        Node(T data, Node* prevNode, Node* nextNode):
-            data_(data),
-            prevNode_(prevNode),
-            nextNode_(nextNode)
+private:
+    struct Node {
+        T data;
+        Node* nextNode;
+
+        Node(T data, Node* nextNode):
+            data(data),
+            nextNode(nextNode)
         { }
     };
 
     Node* head_ = nullptr;
-    Node* tail_ = nullptr;
 
     void swap(QueueList& other) noexcept {
-        head_ = other.head_;
-        tail_ = other.tail_;
+        std::swap(head_, other.head_);
     }
 };
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const QueueList<T>& queue) {
+    std::cout << "head-> ";
+    auto node = queue.head_;
+    while (node != nullptr) {
+        std::cout << node->data << " ";
+        node = node->nextNode;
+    }
+    std::cout << "<-tail\n";
+    return os;
+}
 #endif //QUEUE_LIST_H

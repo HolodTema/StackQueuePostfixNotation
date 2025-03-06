@@ -1,9 +1,13 @@
 #include <iostream>
+#include <queue>
 
 #include "StackArray.h"
 #include "stackExceptions.h"
 
 #include "postfixFromInfix.h"
+
+#include "QueueList.h"
+#include "queueExceptions.h"
 
 void testCreateWrongSizeStack() {
     std::cout << "#########################\n";
@@ -18,7 +22,6 @@ void testCreateWrongSizeStack() {
     }
     std::cout << "#########################\n";
 }
-
 void testPushToStack() {
     std::cout << "#########################\n";
     std::cout << "test: push to stack\n";
@@ -40,7 +43,6 @@ void testPushToStack() {
     std::cout << stack;
     std::cout << "#########################\n";
 }
-
 void testPopFromStack() {
     std::cout << "#########################\n";
     std::cout << "test: pop from stack\n";
@@ -74,7 +76,6 @@ void testPopFromStack() {
     std::cout << "Element from pop(): " << pop3 << "\n";
     std::cout << "#########################\n";
 }
-
 void testPushPopStack() {
     std::cout << "#########################\n";
     std::cout << "test: push and pop stack\n";
@@ -123,7 +124,6 @@ void testPushPopStack() {
     std::cout << stack;
     std::cout << "#########################\n";
 }
-
 void testStackOverflow() {
     std::cout << "#########################\n";
     std::cout << "test: stack overflow exception:\n";
@@ -166,7 +166,6 @@ void testStackOverflow() {
     }
     std::cout << "#########################\n";
 }
-
 void testStackUnderflow() {
     std::cout << "#########################\n";
     std::cout << "test: stack underflow exception:\n";
@@ -212,7 +211,6 @@ void testStackUnderflow() {
     }
     std::cout << "#########################\n";
 }
-
 void testStackIsEmpty() {
     std::cout << "#########################\n";
     std::cout << "test: stack isEmpty():\n";
@@ -230,7 +228,6 @@ void testStackIsEmpty() {
     std::cout << "isEmpty(): " << stack.isEmpty() << "\n";
     std::cout << "#########################\n";
 }
-
 void testStackCopyConstructor() {
     std::cout << "#########################\n";
     std::cout << "test: stack copy constructor:\n";
@@ -262,7 +259,6 @@ void testStackCopyConstructor() {
     std::cout << stack2;
     std::cout << "#########################\n";
 }
-
 void testStackCopyAssignment() {
     std::cout << "#########################\n";
     std::cout << "test: stack copy assignment:\n";
@@ -310,10 +306,9 @@ void testStackCopyAssignment() {
     std::cout << stack2;
     std::cout << "#########################\n";
 }
-
-void testStackMoveConstructor() {
+void testErrorStackMoveConstructor() {
     std::cout << "#########################\n";
-    std::cout << "Create stack1 with simple constructor and push to it:\n";
+    std::cout << "Create stack1 with simple constructor and push to it (error):\n";
     std::cout << "ATTENTION: this test affects double delete[] invokation for the same pointer. I know it.\n";
     StackArray<int> stack1(10);
     stack1.push(100);
@@ -333,10 +328,9 @@ void testStackMoveConstructor() {
     //this test function friend for StackArray class.
     std::cout << "#########################\n";
 }
-
-void testStackMoveAssignment1() {
+void testStackMoveAssignment() {
     std::cout << "#########################\n";
-    std::cout << "test: stack move assignment1:\n";
+    std::cout << "test: stack move assignment:\n";
 
     StackArray<int> stack(5);
     stack.push(100);
@@ -359,10 +353,9 @@ void testStackMoveAssignment1() {
     std::cout << stack;
     std::cout << "#########################\n";
 }
-
-void testStackMoveAssignment2() {
+void testErrorStackMoveAssignment() {
     std::cout << "#########################\n";
-    std::cout << "test: stack move assignment2:\n";
+    std::cout << "test: stack move assignment (error):\n";
     std::cout << "ATTENTION: this test affects double delete[] invokation for the same pointer. I know it.\n";
 
     StackArray<int> stack1(5);
@@ -392,8 +385,6 @@ void testStackMoveAssignment2() {
     std::cout << "#########################\n";
 }
 
-
-
 void myStackTests() {
     testCreateWrongSizeStack();
 
@@ -409,8 +400,10 @@ void myStackTests() {
     testStackCopyConstructor();
     testStackCopyAssignment();
 
-    testStackMoveAssignment1();
+    testStackMoveAssignment();
 }
+
+
 
 void testPostfixFromInfix1() {
     std::cout << "#########################\n";
@@ -560,7 +553,6 @@ void testDivisionByZero() {
     std::cout << "#########################\n";
 }
 
-
 void myPostfixFromInfixTests() {
     testPostfixFromInfix1();
     testPostfixFromInfix2();
@@ -579,11 +571,246 @@ void myPostfixFromInfixTests() {
 
 
 
+void testQueueEnQueue() {
+    std::cout << "#########################\n";
+    std::cout << "test queue enqueue:\n\n";
+
+    QueueList<int> queue;
+
+    queue.enQueue(5);
+    std::cout << "after first enqueue:\n";
+    std::cout << queue;
+
+    queue.enQueue(3);
+    std::cout << "after second enqueue:\n";
+    std::cout << queue;
+
+    queue.enQueue(100);
+    std::cout << "after third enqueue:\n";
+    std::cout << queue;
+    std::cout << "#########################\n";
+}
+
+void testQueueDeQueue() {
+    std::cout << "#########################\n";
+    std::cout << "test queue dequeue:\n\n";
+
+    QueueList<int> queue;
+    queue.enQueue(100);
+    queue.enQueue(150);
+    queue.enQueue(30);
+    queue.enQueue(0);
+
+    std::cout << "Created queue:\n";
+    std::cout << queue;
+    std::cout << "\n";
+
+    int e1 = queue.deQueue();
+    std::cout << "After first dequeue:\n";
+    std::cout << queue;
+    std::cout << "Element from dequeue(): " << e1 << "\n\n";
+
+    int e2 = queue.deQueue();
+    std::cout << "After second dequeue:\n";
+    std::cout << queue;
+    std::cout << "Element from dequeue(): " << e2 << "\n\n";
+
+    int e3 = queue.deQueue();
+    std::cout << "After third dequeue:\n";
+    std::cout << queue;
+    std::cout << "Element from dequeue(): " << e3 << "\n";
+}
+
+void testQueueEnQueueDeQueue() {
+    std::cout << "#########################\n";
+    std::cout << "test queue dequeue:\n\n";
+
+    QueueList<char> queue;
+    queue.enQueue('A');
+    queue.enQueue('B');
+    queue.enQueue('C');
+    queue.enQueue('D');
+
+    std::cout << "Created queue:\n";
+    std::cout << queue;
+    std::cout << "\n";
+
+    char e1 = queue.deQueue();
+    std::cout << "After dequeue:\n";
+    std::cout << queue;
+    std::cout << "Element from dequeue(): " << e1 << "\n\n";
+
+    std::cout << "Enqueue some elements:\n";
+    queue.enQueue('X');
+    queue.enQueue('Y');
+    std::cout << queue;
+    std::cout << "\n";
+
+    char e2 = queue.deQueue();
+    std::cout << "After dequeue:\n";
+    std::cout << queue;
+    std::cout << "Element from dequeue(): " << e2 << "\n\n";
+    std::cout << "#########################\n";
+}
+void testQueueIsEmpty() {
+    std::cout << "#########################\n";
+    std::cout << "test queue isEmpty():\n";
+
+    QueueList<int> queue;
+    std::cout << "Created empty queue:\n";
+    std::cout << queue;
+    std::cout << "isEmpty(): " << queue.isEmpty() << "\n\n";
+
+    std::cout << "enqueue some elements:\n";
+    queue.enQueue(5);
+    queue.enQueue(7);
+    queue.enQueue(3);
+    std::cout << queue;
+    std::cout << "isEmpty(): " << queue.isEmpty() << "\n";
+    std::cout << "#########################\n";
+}
+void testQueueUnderflow() {
+    std::cout << "#########################\n";
+    std::cout << "test queue underflow:\n";
+
+    QueueList<int> queue;
+    std::cout << "Created empty queue:\n\n";
+    std::cout << queue;
+
+    std::cout << "Try to call deQueue():\n";
+    try {
+        queue.deQueue();
+    }
+    catch (const QueueUnderflowException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testQueueCopyConstructor() {
+    std::cout << "#########################\n";
+    std::cout << "test queue copy constructor:\n";
+
+    QueueList<char> queue1;
+    queue1.enQueue('a');
+    queue1.enQueue('b');
+    queue1.enQueue('c');
+    queue1.enQueue('d');
+    std::cout << "Created queue1:\n";
+    std::cout << queue1;
+    std::cout << "\n";
+
+    std::cout << "try: queue2(queue1):\n";
+    QueueList<char> queue2(queue1);
+    std::cout << "queue1:\n" << queue1;
+    std::cout << "queue2:\n" << queue2 << "\n";
+
+    std::cout << "add some elements to queue1:\n";
+    queue1.enQueue('X');
+    queue1.enQueue('Y');
+    queue1.enQueue('Z');
+    std::cout << "queue1:\n" << queue1;
+    std::cout << "queue2:\n" << queue2 << "\n";
+    std::cout << "#########################\n";
+}
+void testQueueCopyAssignment() {
+    std::cout << "#########################\n";
+    std::cout << "test queue copy assignment:\n";
+
+    QueueList<char> queue1;
+    queue1.enQueue('a');
+    queue1.enQueue('b');
+    queue1.enQueue('c');
+    queue1.enQueue('d');
+    std::cout << "Created queue1:\n";
+    std::cout << queue1;
+    std::cout << "\n";
+
+    QueueList<char> queue2;
+    queue2.enQueue('k');
+    queue2.enQueue('l');
+    queue2.enQueue('m');
+    queue2.enQueue('n');
+    std::cout << "Created queue2:\n";
+    std::cout << queue2;
+    std::cout << "\n";
+
+    std::cout << "try: queue2 = queue1:\n";
+    queue2 = queue1;
+    std::cout << "queue1:\n" << queue1;
+    std::cout << "queue2:\n" << queue2 << "\n";
+
+    std::cout << "add some elements to queue2:\n";
+    queue2.enQueue('X');
+    queue2.enQueue('Y');
+    queue2.enQueue('Z');
+    std::cout << "queue1:\n" << queue1;
+    std::cout << "queue2:\n" << queue2;
+    std::cout << "#########################\n";
+}
+void testErrorQueueMoveConstructor() {
+    std::cout << "#########################\n";
+    std::cout << "test queue move constructor (error):\n";
+    std::cout << "ATTENTION: there is double delete operator invokations in this test.\n\n";
+
+    QueueList<int> queue1;
+    queue1.enQueue(5);
+    queue1.enQueue(7);
+    queue1.enQueue(1);
+    queue1.enQueue(4);
+    std::cout << "created queue1:\n";
+    std::cout << queue1 << "\n";
+
+   std::cout << "try: queue2(std::move(queue1));\n";
+    QueueList<int> queue2(std::move(queue1));
+    std::cout << "queue1:\n" << queue1;
+    std::cout << "queue2:\n" << queue2;
+    std::cout << "#########################\n";
+}
+void testErrorQueueMoveAssignment() {
+    std::cout << "#########################\n";
+    std::cout << "test queue move assignment (error):\n";
+    std::cout << "ATTENTION: there is double delete operator invokations in this test.\n\n";
+
+    QueueList<int> queue1;
+    queue1.enQueue(5);
+    queue1.enQueue(50);
+    queue1.enQueue(500);
+    queue1.enQueue(0);
+    std::cout << "created queue1:\n";
+    std::cout << queue1 << "\n";
+
+    QueueList<int> queue2;
+    queue2.enQueue(1);
+    queue2.enQueue(2);
+    queue2.enQueue(3);
+    queue2.enQueue(4);
+    std::cout << "created queue2:\n";
+    std::cout << queue2 << "\n";
+
+    std::cout << "try: queue2 = std::move(queue1):\n";
+    queue2 = std::move(queue1);
+    std::cout << "queue1:\n";
+    std::cout << queue1;
+    std::cout << "queue2:\n";
+    std::cout << queue2;
+
+}
+
+
+void myQueueTests() {
+    testQueueEnQueue();
+    testQueueDeQueue();
+    testQueueEnQueueDeQueue();
+    testQueueIsEmpty();
+    testQueueUnderflow();
+    testQueueCopyConstructor();
+    testQueueCopyAssignment();
+}
+
 
 int main() {
-    // myStackTests();
-
+    myStackTests();
     myPostfixFromInfixTests();
-
+    myQueueTests();
     return 0;
 }
