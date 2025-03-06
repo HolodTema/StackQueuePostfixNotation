@@ -41,7 +41,7 @@ public:
         delete[] array_;
     }
 
-    StackArray &operator=(const StackArray &other) {
+    StackArray& operator=(const StackArray &other) {
         if (this != &other) {
             StackArray otherCopy(other);
             swap(otherCopy);
@@ -49,9 +49,9 @@ public:
         return *this;
     }
 
-    StackArray &operator=(StackArray &&other) noexcept {
+    StackArray& operator=(StackArray &&other) noexcept {
         if (this != &other) {
-            StackArray otherCopy(other);
+            StackArray otherCopy(std::move(other));
             swap(otherCopy);
         }
         return *this;
@@ -72,6 +72,13 @@ public:
         return result;
     }
 
+    T peek() {
+        if (size_ == 0) {
+            throw StackUnderflowException();
+        }
+        return array_[size_-1];
+    }
+
     bool isEmpty() const override {
         return size_ == 0;
     }
@@ -84,7 +91,7 @@ private:
     int size_;
     T *array_;
 
-    void swap(StackArray&other) noexcept {
+    void swap(StackArray& other) noexcept {
         std::swap(capacity_, other.capacity_);
         std::swap(size_, other.size_);
         std::swap(array_, other.array_);
@@ -93,11 +100,11 @@ private:
 
 template <class T>
 std::ostream& operator<<(std::ostream& os, const StackArray<T>& stackArray) {
-    os << "head-> ";
+    os << "bottom-> ";
     for (int i = 0; i < stackArray.size_; ++i) {
         os << stackArray.array_[i] << " ";
     }
-    os << "<-tail\n";
+    os << "<-top\n";
     return os;
 }
 

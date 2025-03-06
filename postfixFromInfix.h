@@ -31,7 +31,7 @@ public:
     }
 };
 
-int getOperatorPriority(const char &ch) {
+int getOperatorPriority(const char& ch) {
     if (ch == '(') {
         return 0;
     }
@@ -50,10 +50,15 @@ int getOperatorPriority(const char &ch) {
     if (ch == '/') {
         return 3;
     }
+    return 0;
 }
 
-bool isOperator(const char &ch) {
-    return ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')';
+bool isOperator(const char& ch) {
+    return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+}
+
+bool isBracket(const char& ch) {
+    return ch == ')' || ch == '(';
 }
 
 bool isDigit(const char &ch) {
@@ -61,94 +66,108 @@ bool isDigit(const char &ch) {
             || ch =='8' || ch == '9';
 }
 
-void getPostfixFromInfix(const char *infix, char *postfix, const size_t stackSize) {
-    StackArray<char> stack(stackSize);
-    int i = 0;
+void getPostfixFromInfix(const char* infix, char* postfix, const size_t stackSize) {
+    StackArray<char> stack(static_cast<int>(stackSize));
+
+    bool isPreviousCharDigit = false;
+    bool isPreviousCharOperator = false;
+    bool isPreviousCharOpenBracket = false;
+    bool isPreviousCharCloseBracket = false;
+
     int resultIndex = 0;
-    char ch = 0;
-
-    bool isPrevCharOperator = false;
-    bool isPrevCharDigit = false;
-
+    int i = 0;
     while (infix[i] != '\0') {
         if (infix[i] == '/' && infix[i+1] == '0') {
             throw DivisionByZeroException();
         }
 
-        ch = infix[i];
+        char currentInfixChar = infix[i];
 
-        if (isDigit(ch)) {
-            if (isPrevCharDigit) {
+        if (isDigit(currentInfixChar)) {
+            if (isPreviousCharDigit) {
                 throw InvalidInfixChainException();
             }
-            isPrevCharDigit = true;
-        }
-        else {
-            isPrevCharDigit = false;
-        }
-        if (ch == '*' || ch == '/' || ch == '+' || ch == '-') {
-            if (isPrevCharOperator) {
+            if (isPreviousCharCloseBracket) {
                 throw InvalidInfixChainException();
             }
-            isPrevCharOperator = true;
 
+            postfix[resultIndex++] = currentInfixChar;
+            isPreviousCharOperator = false;
+            isPreviousCharCloseBracket = false;
+            isPreviousCharOpenBracket = false;
+            isPreviousCharDigit = true;
+            ++i;
+            continue;
         }
-        else {
-            isPrevCharOperator = false;
-        }
 
-        if (isOperator(ch)) {
-
-            if (stack.isEmpty() || ch == '(') {
-                stack.push(ch);
+        if (isOperator(currentInfixChar)) {
+            if (isPreviousCharOperator) {
+                throw InvalidInfixChainException();
             }
-            else if (ch == ')') {
-                bool isOpenBracketFound = false;
-                while (!stack.isEmpty()) {
-                    char previousOperator = stack.pop();
-                    if (previousOperator == '(') {
-                        isOpenBracketFound = true;
-                        break;
-                    }
-                    postfix[resultIndex] = previousOperator;
-                    ++resultIndex;
-                }
-                if (!isOpenBracketFound) {
-                    throw InvalidInfixBracketsException();
-                }
+            if (isPreviousCharOpenBracket) {
+                throw InvalidInfixChainException();
+            }
+
+            if (stack.isEmpty()) {
+                stack.push(currentInfixChar);
             }
             else {
-                int currentPriority = getOperatorPriority(ch);
-                while (!stack.isEmpty()) {
-                    char previousOperator = stack.pop();
-                    int priority = getOperatorPriority(previousOperator);
-
-                    if (priority >= currentPriority) {
-                        postfix[resultIndex] = previousOperator;
-                        ++resultIndex;
-                    } else {
-                        stack.push(previousOperator);
-                        break;
-                    }
+                const int currentPriority = getOperatorPriority(currentInfixChar);
+                while(!stack.isEmpty() && getOperatorPriority(stack.peek()) >= currentPriority) {
+                    postfix[resultIndex++] = stack.pop();
                 }
-                postfix[resultIndex] = ch;
-                ++resultIndex;
+                stack.push(currentInfixChar);
             }
+            isPreviousCharOperator = true;
+            isPreviousCharCloseBracket = false;
+            isPreviousCharOpenBracket = false;
+            isPreviousCharDigit = false;
+            ++i;
+            continue;
         }
-        else if (isDigit(ch)) {
-            postfix[resultIndex] = ch;
-            ++resultIndex;
-        }
-        else {
-            throw InvalidInfixCharException();
-        }
-        ++i;
-    }
 
-    while (!stack.isEmpty()) {
-        postfix[resultIndex] = stack.pop();
-        ++resultIndex;
+        if (isBracket(currentInfixChar)) {
+            if (isPreviousCharOperator && currentInfixChar == ')') {
+                throw InvalidInfixChainException();
+            }
+            if (isPreviousCharDigit && currentInfixChar == '(') {
+                throw InvalidInfixChainException();
+            }
+
+            if (currentInfixChar == '(') {
+                stack.push(currentInfixChar);
+            }
+            else {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    postfix[resultIndex++] = stack.pop();
+                }
+                if (stack.isEmpty()) {
+                    throw InvalidInfixBracketsException();
+                }
+                else {
+                    stack.pop();
+                }
+            }
+
+            isPreviousCharOperator = false;
+            isPreviousCharDigit = false;
+            isPreviousCharCloseBracket = currentInfixChar == ')';
+            isPreviousCharOpenBracket = currentInfixChar == '(';
+            ++i;
+            continue;
+        }
+        throw InvalidInfixCharException();
     }
+    while (!stack.isEmpty()) {
+        const char ch = stack.pop();
+        if (ch == '(') {
+            throw InvalidInfixBracketsException();
+        }
+        postfix[resultIndex++] = ch;
+    }
+    postfix[resultIndex++] = '\0';
 }
+
+
 
 #endif //POSTFIX_FROM_INFIX_H

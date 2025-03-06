@@ -8,4 +8,5 @@ add_executable(StackArray main.cpp
         StackArray.h
         postfixFromInfix.h
         Queue.h
-        QueueList.h)
+        QueueList.h
+        queueExceptions.h)

@@ -36,7 +36,7 @@ void testPushToStack() {
     std::cout << "\n";
 
     stack.push(12);
-    std::cout << "Stack after first push:\n";
+    std::cout << "Stack after third push:\n";
     std::cout << stack;
     std::cout << "#########################\n";
 }
@@ -57,19 +57,19 @@ void testPopFromStack() {
     std::cout << "\n";
 
     int pop1 = stack.pop();
-    std::cout << "Stack after 1 pop:\n";
+    std::cout << "Stack after first pop:\n";
     std::cout << stack;
     std::cout << "Element from pop(): " << pop1 << "\n";
     std::cout << "\n";
 
     int pop2 = stack.pop();
-    std::cout << "Stack after 2 pop:\n";
+    std::cout << "Stack after second pop:\n";
     std::cout << stack;
     std::cout << "Element from pop(): " << pop2 << "\n";
     std::cout << "\n";
 
     int pop3 = stack.pop();
-    std::cout << "Stack after 1 pop:\n";
+    std::cout << "Stack after third pop:\n";
     std::cout << stack;
     std::cout << "Element from pop(): " << pop3 << "\n";
     std::cout << "#########################\n";
@@ -231,7 +231,7 @@ void testStackIsEmpty() {
     std::cout << "#########################\n";
 }
 
-void testStackCopy() {
+void testStackCopyConstructor() {
     std::cout << "#########################\n";
     std::cout << "test: stack copy constructor:\n";
 
@@ -311,37 +311,32 @@ void testStackCopyAssignment() {
     std::cout << "#########################\n";
 }
 
-StackArray<int> forTestGetStackToMove() {
-    StackArray<int> stack(10);
-    stack.push(3);
-    stack.push(5);
-    stack.push(7);
-    stack.push(9);
-    return stack;
-}
-
-void testStackMove() {
+void testStackMoveConstructor() {
     std::cout << "#########################\n";
-    std::cout << "test: stack move constructor:\n";
+    std::cout << "Create stack1 with simple constructor and push to it:\n";
+    std::cout << "ATTENTION: this test affects double delete[] invokation for the same pointer. I know it.\n";
+    StackArray<int> stack1(10);
+    stack1.push(100);
+    stack1.push(50);
+    stack1.push(20);
+    std::cout << "stack1:\n";
+    std::cout << stack1;
 
-    StackArray<int> stack = forTestGetStackToMove();
+    std::cout << "Create stack2(std::move(stack1)) - with move constructor:\n";
+    StackArray<int> stack2(std::move(stack1));
+    std::cout << "stack2:\n";
+    std::cout << stack2;
 
-    std::cout << "Create stack with move constructor:\n";
-    std::cout << stack;
-    std::cout << "\n";
-
-    std::cout << "Push to stack:\n";
-    stack.push(1);
-    stack.push(2);
-    stack.push(3);
-    stack.push(4);
-    std::cout << stack;
+    //there is double delete[] operator invokation,
+    //because private pointers in stack1 and stack2 are cleared twice.
+    //it is impossible to avoid this effect during the test without making
+    //this test function friend for StackArray class.
     std::cout << "#########################\n";
 }
 
-void testStackMoveAssignment() {
+void testStackMoveAssignment1() {
     std::cout << "#########################\n";
-    std::cout << "test: stack move assignment:\n";
+    std::cout << "test: stack move assignment1:\n";
 
     StackArray<int> stack(5);
     stack.push(100);
@@ -351,8 +346,8 @@ void testStackMoveAssignment() {
     std::cout << stack;
     std::cout << "\n";
 
-    std::cout << "Make stack = %rvalue%:\n";
-    stack = forTestGetStackToMove();
+    std::cout << "Make stack = rvalue:\n";
+    stack = StackArray<int>(20);
     std::cout << stack;
     std::cout << "\n";
 
@@ -362,6 +357,38 @@ void testStackMoveAssignment() {
     stack.push(3);
     stack.push(4);
     std::cout << stack;
+    std::cout << "#########################\n";
+}
+
+void testStackMoveAssignment2() {
+    std::cout << "#########################\n";
+    std::cout << "test: stack move assignment2:\n";
+    std::cout << "ATTENTION: this test affects double delete[] invokation for the same pointer. I know it.\n";
+
+    StackArray<int> stack1(5);
+    stack1.push(100);
+    stack1.push(200);
+    stack1.push(500);
+    std::cout << "Created stack1 via simple constructor:\n";
+    std::cout << stack1;
+    std::cout << "\n";
+
+    StackArray<int> stack2(10);
+    stack2.push(1000);
+    stack2.push(300);
+    std::cout << "Created stack2 via simple constructor:\n";
+    std::cout << stack2;
+    std::cout << "\n";
+
+    std::cout << "Try: stack2 = std::move(stack1):\n";
+    stack2 = std::move(stack1);
+    std::cout << "stack2:\n";
+    std::cout << stack2;
+
+    //there is double delete[] operator invokation,
+    //because private pointers in stack1 and stack2 are cleared twice.
+    //it is impossible to avoid this effect during the test without making
+    //this test function friend for StackArray class.
     std::cout << "#########################\n";
 }
 
@@ -379,13 +406,176 @@ void myStackTests() {
 
     testStackIsEmpty();
 
-    testStackCopy();
+    testStackCopyConstructor();
     testStackCopyAssignment();
 
-    testStackMove();
-    testStackMoveAssignment();
+    testStackMoveAssignment1();
 }
 
+void testPostfixFromInfix1() {
+    std::cout << "#########################\n";
+    std::cout << "test postfix from infix 1:\n";
+    std::cout << "\n";
+
+    char* expected = "62-\0";
+
+    const char* infix = "6-2\0";
+    char postfix[30];
+    getPostfixFromInfix(infix, postfix, 100);
+
+    std::cout << "expected result: " << expected << "\n";
+    std::cout << "result: " << postfix << "\n";
+    std::cout << "#########################\n";
+}
+void testPostfixFromInfix2() {
+    std::cout << "#########################\n";
+    std::cout << "test postfix from infix 2:\n";
+    std::cout << "\n";
+
+    char* expected = "12+34+*5-\0";
+
+    const char* infix = "(1+2)*(3+4)-5\0";
+    char postfix[30];
+    getPostfixFromInfix(infix, postfix, 100);
+
+    std::cout << "expected result: " << expected << "\n";
+    std::cout << "result: " << postfix << "\n";
+    std::cout << "#########################\n";
+}
+void testPostfixFromInfix3() {
+    std::cout << "#########################\n";
+    std::cout << "test postfix from infix 3:\n";
+    std::cout << "\n";
+
+    char* expected = "87-3*22+*9+\0";
+
+    const char* infix = "(8-7)*3*(2+2)+9\0";
+    char postfix[30];
+    getPostfixFromInfix(infix, postfix, 100);
+
+    std::cout << "expected result: " << expected << "\n";
+    std::cout << "result: " << postfix << "\n";
+    std::cout << "#########################\n";
+}
+void testIncorrectInfixChars() {
+    std::cout << "#########################\n";
+    std::cout << "test incorrect infix chars:\n";
+    std::cout << "\n";
+
+    const char* infix = "(9+B)-3\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(InvalidInfixCharException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testIncorrectInfixChain1() {
+    std::cout << "#########################\n";
+    std::cout << "test incorrect infix chain1:\n";
+    std::cout << "\n";
+
+    const char* infix = "7*3-2+(7--)+1\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(InvalidInfixChainException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testIncorrectInfixChain2() {
+    std::cout << "#########################\n";
+    std::cout << "test incorrect infix chain2:\n";
+    std::cout << "\n";
+
+    const char* infix = "(79+8)*3\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(InvalidInfixChainException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testInvalidBrackets1() {
+    std::cout << "#########################\n";
+    std::cout << "test invalid brackets1:\n";
+    std::cout << "\n";
+
+    const char* infix = "(8+3))*7-1\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(InvalidInfixBracketsException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testInvalidBrackets2() {
+    std::cout << "#########################\n";
+    std::cout << "test invalid brackets2:\n";
+    std::cout << "\n";
+
+    const char* infix = "7-3/((1-3)\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(InvalidInfixBracketsException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+void testDivisionByZero() {
+    std::cout << "#########################\n";
+    std::cout << "test division by zero:\n";
+    std::cout << "\n";
+
+    const char* infix = "1+2/0-3\0";
+    std::cout << "infix expression: " << infix << "\n";
+
+    char postfix[30];
+    try {
+        getPostfixFromInfix(infix, postfix, 100);
+    }
+    catch(DivisionByZeroException& e) {
+        std::cout << e.what();
+    }
+    std::cout << "#########################\n";
+}
+
+
+void myPostfixFromInfixTests() {
+    testPostfixFromInfix1();
+    testPostfixFromInfix2();
+    testPostfixFromInfix3();
+
+    testIncorrectInfixChars();
+
+    testIncorrectInfixChain1();
+    testIncorrectInfixChain2();
+
+    testInvalidBrackets1();
+    testInvalidBrackets2();
+
+    testDivisionByZero();
+}
 
 
 
@@ -393,13 +583,7 @@ void myStackTests() {
 int main() {
     // myStackTests();
 
-    const char* infix = "6-2\0";
-    char* postfix = new char[30];
+    myPostfixFromInfixTests();
 
-    getPostfixFromInfix(infix, postfix, 100);
-
-    std::cout << postfix;
-    delete[] infix;
-    delete[] postfix;
     return 0;
 }
