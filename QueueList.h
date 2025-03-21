@@ -70,7 +70,7 @@ public:
 
     T deQueue() override {
         if (head_ == nullptr) {
-            throw QueueUnderflowException();
+            throw QueueUnderflow();
         }
 
         T result = head_->data;

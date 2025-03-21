@@ -14,7 +14,7 @@ public:
         size_(0)
     {
         if (capacity_ <= 0) {
-            throw WrongStackSizeException();
+            throw WrongStackSize();
         }
         array_ = new T[capacity_];
     }
@@ -59,14 +59,14 @@ public:
 
     void push(const T &element) override {
         if (size_ == capacity_) {
-            throw StackOverflowException();
+            throw StackOverflow();
         }
         array_[size_++] = element;
     }
 
     T pop() override {
         if (size_ == 0) {
-            throw StackUnderflowException();
+            throw StackUnderflow();
         }
         T result = array_[--size_];
         return result;
@@ -74,7 +74,7 @@ public:
 
     T peek() {
         if (size_ == 0) {
-            throw StackUnderflowException();
+            throw StackUnderflow();
         }
         return array_[size_-1];
     }

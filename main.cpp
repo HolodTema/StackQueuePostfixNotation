@@ -16,7 +16,7 @@ void testCreateWrongSizeStack() {
         StackArray<int> stack(-4);
         std::cout << "Exception was not thrown.\n";
     }
-    catch (const WrongStackSizeException& e) {
+    catch (const WrongStackSize& e) {
         std::cout << e.what();
         std::cout << "Exception was thrown.\n";
     }
@@ -160,7 +160,7 @@ void testStackOverflow() {
 
         std::cout << "Exception was not thrown\n";
     }
-    catch (const StackOverflowException& e) {
+    catch (const StackOverflow& e) {
         std::cout << e.what();
         std::cout << "Exception was thrown.\n";
     }
@@ -205,7 +205,7 @@ void testStackUnderflow() {
 
         std::cout << "Exception was not thrown\n";
     }
-    catch (const StackUnderflowException& e) {
+    catch (const StackUnderflow& e) {
         std::cout << e.what();
         std::cout << "Exception was thrown.\n";
     }
@@ -681,7 +681,7 @@ void testQueueUnderflow() {
     try {
         queue.deQueue();
     }
-    catch (const QueueUnderflowException& e) {
+    catch (const QueueUnderflow& e) {
         std::cout << e.what();
     }
     std::cout << "#########################\n";
@@ -807,10 +807,258 @@ void myQueueTests() {
     testQueueCopyAssignment();
 }
 
+void stackTest()
+{
+  std::cout << "--stackTest begin--\n";
+
+  Stack<int>* intStack = new StackArray<int>(5);
+
+  std::cout << "Stack is empty: " << intStack->isEmpty() << '\n';
+
+  intStack->push(1);
+  intStack->push(2);
+  intStack->push(3);
+  intStack->push(4);
+  intStack->push(5);
+
+  std::cout << intStack->pop() << '\n';
+  std::cout << intStack->pop() << '\n';
+
+  std::cout << "Stack is empty: " << intStack->isEmpty() << '\n';
+
+  intStack->push(7);
+  intStack->push(8);
+
+  std::cout << "Stack is empty: " << intStack->isEmpty() << '\n';
+
+  std::cout << intStack->pop() << '\n';
+  std::cout << intStack->pop() << '\n';
+  std::cout << intStack->pop() << '\n';
+  std::cout << intStack->pop() << '\n';
+  std::cout << intStack->pop() << '\n';
+
+  std::cout << "Stack is empty: " << intStack->isEmpty() << '\n';
+
+  delete intStack;
+
+  std::cout << "--stackTest end--\n";
+}
+void stackExceptionTest()
+{
+  std::cout << "--stackExceptionTest begin--\n";
+
+  // для StackArray
+  try
+  {
+    StackArray<int> intStack(0);
+  }
+  catch (const WrongStackSize& e)
+  {
+    std::cout << "WrongStackSize exception\n";
+  }
+
+  StackArray<int> intStack(3);
+  //StackVector<int> intStack;
+  //StackList<int> intStack;
+
+  intStack.push(1);
+  intStack.push(2);
+  intStack.push(3);
+
+  // для StackArray
+  try
+  {
+    intStack.push(4);
+  }
+  catch (const StackOverflow& e)
+  {
+    std::cout << "StackOverflow exception\n";
+  }
+
+  intStack.pop();
+  intStack.pop();
+  intStack.pop();
+
+  try
+  {
+    std::cout << intStack.pop() << '\n';
+  }
+  catch (const StackUnderflow& e)
+  {
+    std::cout << "StackUnderflow exception\n";
+  }
+
+  std::cout << "--stackExceptionTest end--\n";
+}
+void queueTest()
+{
+  std::cout << "--queueTest begin--\n";
+
+  // Queue<std::string>* strQueue = new QueueArray<std::string>(5);
+  //Queue<std::string>* strQueue = new QueueVector<std::string>;
+  Queue<std::string>* strQueue = new QueueList<std::string>;
+
+  std::cout << "Queue is empty: " << strQueue->isEmpty() << '\n';
+
+  strQueue->enQueue("ab");
+  strQueue->enQueue("cd");
+  strQueue->enQueue("ef");
+  strQueue->enQueue("gh");
+  strQueue->enQueue("ij");
+
+  std::cout << strQueue->deQueue() << '\n';
+  std::cout << strQueue->deQueue() << '\n';
+
+  std::cout << "Queue is empty: " << strQueue->isEmpty() << '\n';
+
+  strQueue->enQueue("kl");
+  strQueue->enQueue("mn");
+
+  std::cout << "Queue is empty: " << strQueue->isEmpty() << '\n';
+
+  std::cout << strQueue->deQueue() << '\n';
+  std::cout << strQueue->deQueue() << '\n';
+  std::cout << strQueue->deQueue() << '\n';
+  std::cout << strQueue->deQueue() << '\n';
+  std::cout << strQueue->deQueue() << '\n';
+
+  std::cout << "Queue is empty: " << strQueue->isEmpty() << '\n';
+
+  delete strQueue;
+
+  std::cout << "--queueTest end--\n";
+}
+void queueExceptionTest()
+{
+  std::cout << "--queueExceptionTest begin--\n";
+
+  // для QueueArray
+  // try
+  // {
+  //   QueueArray<int> intQueue(0);
+  // }
+  // catch (const WrongQueueSize& e)
+  // {
+  //   std::cout << "WrongQueueSize exception\n";
+  // }
+  //
+  // QueueArray<int> intQueue(3);
+  //QueueVector<int> intQueue;
+  QueueList<int> intQueue;
+
+  intQueue.enQueue(1);
+  intQueue.enQueue(2);
+  intQueue.enQueue(3);
+
+  // для QueueArray
+  // try
+  // {
+  //   intQueue.enQueue(4);
+  // }
+  // catch (const QueueOverflow& e)
+  // {
+  //   std::cout << "QueueOverflow exception\n";
+  // }
+
+  intQueue.deQueue();
+  intQueue.deQueue();
+  intQueue.deQueue();
+
+  try
+  {
+    std::cout << intQueue.deQueue() << '\n';
+  }
+  catch (const QueueUnderflow& e)
+  {
+    std::cout << "QueueUnderflow exception\n";
+  }
+
+  std::cout << "--queueExceptionTest end--\n";
+}
+void bracketsTest()
+{
+  // Если нет в вашем варианте, замените на
+  std::cout << "not implemented\n";
+}
+void postfixTest()
+{
+  // Если нет в вашем варианте, замените на
+  // std::cout << "not implemented\n";
+
+  std::cout << "--postfixTest begin--\n";
+
+  char postfix[10];
+  // исправьте количество аргументов
+  getPostfixFromInfix("1+2*3", postfix, 10);
+  std::cout << postfix << '\n';
+  getPostfixFromInfix("(1+2)*3+4", postfix, 10);
+  std::cout << postfix << '\n';
+  getPostfixFromInfix("4+(1+2)/3", postfix, 10);
+  std::cout << postfix << '\n';
+  try
+  {
+    getPostfixFromInfix("1+2*3+", postfix, 10);
+  }
+  catch (const std::exception&)
+  {
+    std::cout << "error\n";
+  }
+  try
+  {
+    getPostfixFromInfix("1+23", postfix, 10);
+  }
+  catch (const std::exception&)
+  {
+    std::cout << "error\n";
+  }
+
+  std::cout << "--postfixTest end--\n";
+}
+int dlTestsNew()
+{
+  int i = 0;
+  std::cin >> i;
+  switch (i)
+  {
+  case 1:
+    stackTest();
+    break;
+  case 2:
+    stackExceptionTest();
+    break;
+  case 3:
+    queueTest();
+    break;
+  case 4:
+    queueExceptionTest();
+    break;
+  case 5:
+    bracketsTest();
+    break;
+  case 6:
+    postfixTest();
+    break;
+  }
+
+  return 0;
+}
+
 
 int main() {
-    myStackTests();
-    myPostfixFromInfixTests();
-    myQueueTests();
+    // myStackTests();
+    // myPostfixFromInfixTests();
+    // myQueueTests();
+
+    // dlTestsNew();
+
+    char* postfix = new char[100];
+    try {
+        getPostfixFromInfix("1+2*3+", postfix, 100);
+    }
+    catch (std::exception& e) {
+        std::cout << e.what();
+    }
+    std::cout << postfix << '\n';
+
     return 0;
 }

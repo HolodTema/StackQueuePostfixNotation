@@ -125,7 +125,7 @@ void getPostfixFromInfix(const char* infix, char* postfix, const size_t stackSiz
             ++i;
             continue;
         }
-
+// 123*++
         if (isBracket(currentInfixChar)) {
             if (isPreviousCharOperator && currentInfixChar == ')') {
                 throw InvalidInfixChainException();

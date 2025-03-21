@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-class QueueUnderflowException: public std::exception {
+class QueueUnderflow: public std::exception {
 public:
     const char* what() const noexcept override {
         return "Error: queue underflow.\n";
